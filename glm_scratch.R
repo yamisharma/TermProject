@@ -4,10 +4,10 @@ test <- as.integer(df$grade >= 0.01)
 df$test <- test
 glmout <- glm(r45~registered+certified, data = df, family = binomial)
 glmout
+predict(glmout)
 
-####
-#Call:  glm(formula = test ~ registered + certified, family = binomial, 
- #          data = df)
+# Results of calling glmout (note: this is not from calling predict)
+#Call:  glm(formula = test ~ registered + certified, family = binomial, data = df)
 
 #Coefficients:
 #  (Intercept)   registered    certified  
@@ -17,5 +17,4 @@ glmout
 #(298 observations deleted due to missingness)
 #Null Deviance:	    365.7 
 #Residual Deviance: 328 	AIC: 332
-##
-predict(glmout)
+
