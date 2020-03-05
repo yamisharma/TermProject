@@ -1,11 +1,12 @@
 df <- read.csv("/Users/yaminisharma/desktop/MOOC.csv")[1:1000,]
 View(df)
-df$r45 <- r45
+test <- as.integer(df$grade >= 0.01)
+df$test <- test
 glmout <- glm(r45~registered+certified, data = df, family = binomial)
 glmout
 
 ####
-#Call:  glm(formula = r45 ~ registered + certified, family = binomial, 
+#Call:  glm(formula = test ~ registered + certified, family = binomial, 
  #          data = df)
 
 #Coefficients:
