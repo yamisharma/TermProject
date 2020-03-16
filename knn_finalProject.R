@@ -21,7 +21,7 @@ embedded_train <- embedMeans(train)
 embedded_test <- embedMeans(test)
 
 # use knn
-model <- knn(embedded_train, embedded_test, NULL, k = 5, prob = true)
+model <- knn(embedded_train, embedded_test, embedded_train, k = 5, prob = true)
 
 # predict
 pred <- predict(model, test)
@@ -42,4 +42,18 @@ embedMeans <- function(dataIn){
   return(meanUserRatings)
 }
 
-
+my_knn <- function(dataIn, targetUser, targetItem, k){
+  # Only consider relevant users
+  new_users <- dataIn[c(song_data[(song_data$ItemID == targetItem),]$UserID),]
+  if (k > len(new_users)) {
+    throw an error
+  }
+  # Compare dist b/w users
+  user_dists <- apply(dataIn$UserID, FUN = cosDist(rat_by_user, ))
+  # Create neighborhood (choose k closest)
+  user_dists <- sort.list(user_dists)
+  # Make list of all ratings from neighbors
+  
+  # Take probab equal to ratio of one rating num to the others
+}
+my_knn(song_data, 0, 7171)
