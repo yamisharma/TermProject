@@ -27,29 +27,36 @@ createMatrix <- function(rating, dataIn) {
     }
   }
   dataIn$rating <- apply(dataIn, 1, f)
+  return(dataIn)
 }
 
 createMatrixList <- function(dataIn) {
   f = function (rating) {
     createMatrix(rating, dataIn)
   }
-  lapply(1:5, f)
+  list <- lapply(1:5, f)
 }
 
-nmfFunc <- function(ratingsIn, testSet, rnk) {
-  require(recosystem)
-  r <- Reco()
+fitModels <- function(ratingsIn, testSet, rnk) {
+  f = function(i) {
+    require(recosystem)
+    r <- Reco()
+    
+    trainlist <- createMatrixList(ratingsIn)
+    train <- trainlist[[i]]
+    testlist <- createMatrixList(testSet)
+    test <- testlist[[i]]
+    dataset <- data_memory(train[,1],train[,2],train[,3],index1=TRUE)
+    testset <- data_memory(test[,1],test[,2],test[,3],index1=TRUE)
+    
+    r$train(dataset, opts=list(dim=rnk, nmf=TRUE))
+    result <- r$output(out_memory(),out_memory())
+    
+    preds <- r$predict(testset, out_memory())
+  }
   
-  matrixlist <- createMatrixList(ratingsIn)
-  matrix <- matrixlist[[1]]
-  dataset <- data_memory(ratingsIn[,1],ratingsIn[,2],ratingsIn[,3],index1=TRUE)
-  testset <- data_memory(testSet[,1],testSet[,2],testSet[,3],index1=TRUE)
-  
-  r$train(dataset, opts=list(dim=rnk, nmf=TRUE))
-  result <- r$output(out_memory(),out_memory())
-
-  preds <- r$predict(testset, out_memory())
+  predlist <- lapply(1:5, f)
 }
 
 
-nmfFunc(trainIE, tstSong, 6)
+fitModels(trainIE, tstSong, 6)
