@@ -43,8 +43,9 @@ embedMeans <- function(dataIn){
 }
 
 my_knn <- function(dataIn, targetUser, targetItem, k){
+  names(dataIn) <- c("UserID","ItemID","rating")
   # Only consider relevant users
-  new_users <- as.numeric(as.vector(dataIn[dataIn$ItemID == targetItem,5]))
+  new_users <- as.numeric(as.vector(dataIn[dataIn$ItemID == targetItem,1]))
   if (k > length(new_users)) {
     tryCatch("k must be <= num of relevant users")
   }
