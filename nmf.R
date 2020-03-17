@@ -1,13 +1,17 @@
 library(lme4)
-library(partykit)
 data(InstEval)
 ie <- InstEval
 ie <- ie[,c(1:2,7)]
 names(ie) <- c("userId", "itemId", "rating")
+ie$userId <- as.factor(ie$userId)
+ie$itemId <- as.factor(ie$itemId)
+ie$rating <- as.factor(ie$rating)
 
 song <- read.csv(file="songsDataset.csv")
 names(song) <- c("userId", "itemId", "rating")
-
+song$userId <- as.factor(song$userId)
+song$itemId <- as.factor(song$itemId)
+song$rating <- as.factor(song$rating)
 
 testSetIndices <- sample(1: nrow(ie), 3670)
 trainIE <- ie[-testSetIndices, ]
@@ -38,13 +42,15 @@ createMatrixList <- function(dataIn) {
 }
 
 fitModels <- function(ratingsIn, testSet, rnk) {
+  
+  trainlist <- createMatrixList(ratingsIn)
+  testlist <- createMatrixList(testSet)
+
   f = function(i) {
     require(recosystem)
     r <- Reco()
     
-    trainlist <- createMatrixList(ratingsIn)
     train <- trainlist[[i]]
-    testlist <- createMatrixList(testSet)
     test <- testlist[[i]]
     dataset <- data_memory(train[,1],train[,2],train[,3],index1=TRUE)
     testset <- data_memory(test[,1],test[,2],test[,3],index1=TRUE)
@@ -52,11 +58,11 @@ fitModels <- function(ratingsIn, testSet, rnk) {
     r$train(dataset, opts=list(dim=rnk, nmf=TRUE))
     result <- r$output(out_memory(),out_memory())
     
-    preds <- r$predict(testset, out_memory())
+    A <- result$P %*% t(result$Q)
   }
   
-  predlist <- lapply(1:5, f)
+  Alist <- lapply(1:5, f)
 }
 
 
-fitModels(trainIE, tstSong, 6)
+list <- fitModels(trainSong, tstSong, 6)
