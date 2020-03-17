@@ -44,16 +44,21 @@ embedMeans <- function(dataIn){
 
 my_knn <- function(dataIn, targetUser, targetItem, k){
   # Only consider relevant users
-  new_users <- dataIn[c(song_data[(song_data$ItemID == targetItem),]$UserID),]
-  if (k > len(new_users)) {
-    throw an error
+  new_users <- as.numeric(as.vector(dataIn[dataIn$ItemID == targetItem,1]))
+  if (k > length(new_users)) {
+    tryCatch("k must be <= num of relevant users")
   }
   # Compare dist b/w users
-  user_dists <- apply(dataIn$UserID, FUN = cosDist(rat_by_user, ))
+  user_dists <- matrix(0,0,2)
+  for (user_itr in new_users) {
+    user_dists <- rbind(user_dists, c(user_itr,dist(x=rbind(as.vector(dataIn$ItemID[dataIn$UserID == targetUser]),as.vector(dataIn$ItemID[dataIn$UserID == user_itr])))))
+  }
   # Create neighborhood (choose k closest)
-  user_dists <- sort.list(user_dists)
+  user_dists <- as.data.frame(user_dists)
+  user_dists <- user_dists[order(user_dists$V2),]
+  View(user_dists)
   # Make list of all ratings from neighbors
   
   # Take probab equal to ratio of one rating num to the others
 }
-my_knn(song_data, 0, 7171)
+my_knn(song_data, 0, 7171, 1)
