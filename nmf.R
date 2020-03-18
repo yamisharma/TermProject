@@ -41,10 +41,10 @@ createMatrixList <- function(dataIn) {
   list <- lapply(1:5, f)
 }
 
-fitModels <- function(ratingsIn, testSet, rnk) {
+fitModels <- function(ratingsIn, testSet, rnk=20) {
   trainlist <- createMatrixList(ratingsIn)
   testlist <- createMatrixList(testSet)
-
+  
   f = function(i) {
     require(recosystem)
     r <- Reco()
@@ -52,6 +52,12 @@ fitModels <- function(ratingsIn, testSet, rnk) {
     test <- testlist[[i]]
     dataset <- data_memory(train[,1],train[,2],train[,3],index1=TRUE)
     testset <- data_memory(test[,1],test[,2],test[,3],index1=TRUE)
+    
+    # set.seed(123) 
+    # opts_tune <- r$tune(trainset)$min
+    # print(opts_tune)
+    
+    # tune function indicates rank 20 to be optimal
     r$train(dataset, opts=list(dim=rnk, nmf=TRUE))
     preds <- r$predict(testset, out_memory())
   }
@@ -60,6 +66,6 @@ fitModels <- function(ratingsIn, testSet, rnk) {
 }
 
 
-list <- fitModels(trainIE, tstIE, 6)
+list <- fitModels(trainIE, tstIE, 20)
 mat <- cbind(list[[1]],list[[2]],list[[3]],list[[4]],list[[5]])
 
