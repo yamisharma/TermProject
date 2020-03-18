@@ -42,27 +42,24 @@ createMatrixList <- function(dataIn) {
 }
 
 fitModels <- function(ratingsIn, testSet, rnk) {
-  
   trainlist <- createMatrixList(ratingsIn)
   testlist <- createMatrixList(testSet)
 
   f = function(i) {
     require(recosystem)
     r <- Reco()
-    
     train <- trainlist[[i]]
     test <- testlist[[i]]
     dataset <- data_memory(train[,1],train[,2],train[,3],index1=TRUE)
     testset <- data_memory(test[,1],test[,2],test[,3],index1=TRUE)
-    
     r$train(dataset, opts=list(dim=rnk, nmf=TRUE))
-    result <- r$output(out_memory(),out_memory())
-    
-    A <- result$P %*% t(result$Q)
+    preds <- r$predict(testset, out_memory())
   }
   
-  Alist <- lapply(1:5, f)
+  predList <- lapply(1:5, f)
 }
 
 
-list <- fitModels(trainSong, tstSong, 6)
+list <- fitModels(trainIE, tstIE, 6)
+mat <- cbind(list[[1]],list[[2]],list[[3]],list[[4]],list[[5]])
+
