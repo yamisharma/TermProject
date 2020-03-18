@@ -42,10 +42,11 @@ embedMeans <- function(dataIn){
   return(meanUserRatings)
 }
 
-my_knn <- function(dataIn, targetUser, targetItem, k){
+my_knn <- function(dataIn, targetUser, targetItem, k, maxRating){
   names(dataIn) <- c("UserID","ItemID","rating")
   # Only consider relevant users
   new_users <- as.numeric(as.vector(dataIn[dataIn$ItemID == targetItem,1]))
+  new_users <- new_users[new_users != targetUser]
   if (k > length(new_users)) {
     tryCatch("k must be <= num of relevant users")
   }
@@ -57,23 +58,18 @@ my_knn <- function(dataIn, targetUser, targetItem, k){
   # Create neighborhood (choose k closest)
   user_dists <- as.data.frame(user_dists)
   user_dists <- user_dists[order(user_dists$V2),]
-  user_dists <- user_dists[2:(k-1),]
+  user_dists <- user_dists[1:k,]
   # Make list of all ratings from neighbors
   neigh_rats <- matrix(0,0,1)
   for (user_itr in user_dists$V1) {
     neigh_rats <- rbind(neigh_rats, dataIn$rating[dataIn$UserID == user_itr & dataIn$ItemID == targetItem])
   }
   # Take probab equal to ratio of one rating num to the others
-  prob1 <- length(neigh_rats[neigh_rats == 1]) / length(neigh_rats)
-  prob2 <- length(neigh_rats[neigh_rats == 2]) / length(neigh_rats)
-  prob3 <- length(neigh_rats[neigh_rats == 3]) / length(neigh_rats)
-  prob4 <- length(neigh_rats[neigh_rats == 4]) / length(neigh_rats)
-  prob5 <- length(neigh_rats[neigh_rats == 5]) / length(neigh_rats)
+  probs_out <- matrix(0,0,1)
+  for (itr in 1:maxRating) {
+    probs_out <- rbind(probs_out, (length(neigh_rats[neigh_rats == itr]) / length(neigh_rats)))
+  }
   
-  print(prob1)
-  print(prob2)
-  print(prob3)
-  print(prob4)
-  print(prob5)
+  print(probs_out)
 }
-my_knn(song_data, 55346, 0, 5)
+my_knn(song_data, 55346, 0, 4, 5)
