@@ -22,7 +22,7 @@ trainSong <- song[-testSetIndices, ]
 tstSong <- song[testSetIndices, ]
 
 
-createMatrix <- function(rating, dataIn) {
+createMatrix <- function(rating, data) {
   f = function (x, output) {
     if (x[3] == rating) {
       x[3] = 1
@@ -30,28 +30,26 @@ createMatrix <- function(rating, dataIn) {
       x[3] = 0
     }
   }
-  dataIn$rating <- apply(dataIn, 1, f)
-  return(dataIn)
+  data$rating <- apply(data, 1, f)
+  return(data)
 }
 
-createMatrixList <- function(dataIn) {
+createMatrixList <- function(data) {
   f = function (rating) {
-    createMatrix(rating, dataIn)
+    createMatrix(rating, data)
   }
   list <- lapply(1:5, f)
 }
 
-fitModels <- function(ratingsIn, testSet, rnk=20) {
+fitModels <- function(ratingsIn, testSet, rnk) {
   trainlist <- createMatrixList(ratingsIn)
-  testlist <- createMatrixList(testSet)
-  
+
   f = function(i) {
     require(recosystem)
     r <- Reco()
     train <- trainlist[[i]]
-    test <- testlist[[i]]
     dataset <- data_memory(train[,1],train[,2],train[,3],index1=TRUE)
-    testset <- data_memory(test[,1],test[,2],test[,3],index1=TRUE)
+    testset <- data_memory(testSet[,1],testSet[,2],testSet[,3],index1=TRUE)
     
     # set.seed(123) 
     # opts_tune <- r$tune(trainset)$min
@@ -62,10 +60,20 @@ fitModels <- function(ratingsIn, testSet, rnk=20) {
     preds <- r$predict(testset, out_memory())
   }
   
-  predList <- lapply(1:5, f)
+  list <- lapply(1:5, f)
+  mat <- cbind(list[[1]],list[[2]],list[[3]],list[[4]],list[[5]])
 }
 
+probsFitNmf <- function(dataIn, maxRating, predMethod, specialArgs) {
+  probsFitOut <- list(specialArgs[["rank"]],dataIn)
+  class(probsFitOut) <- "recProbs"
+  return (probsFitOut)
+}
 
-list <- fitModels(trainIE, tstIE, 20)
-mat <- cbind(list[[1]],list[[2]],list[[3]],list[[4]],list[[5]])
-
+predictNmf <- function(probsFitOut, newXS) {
+  rnk <- probsFitOut[[1]]
+  train <- probsFitOut[[2]]
+  newXS$rating <- NA
+  tst <- newXS
+  mat <- fitModels(train, tst, rnk)
+}
