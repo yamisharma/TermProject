@@ -47,14 +47,14 @@ tstSong <- song[testSetIndices, ]
 ratingProbsFit(trainIE, 5, 'CART', TRUE, 4)
     
  ####
- elseif(probsFitOut == 'CART')
+ elseif(probsFitOut == 'CART'){
   #replace ratings In with newXS --- newXS is basically the test set from emb in the org cart func above
-  ratingsIn$userId <- as.factor(ratingsIn$userId)
-  ratingsIn$itemId <- as.factor(ratingsIn$itemId)
+   newXS$userId <- as.factor( newXS$userId)
+   newXS$itemId <- as.factor( newXS$itemId)
 
-  userMeans <- tapply(ratingsIn$rating, ratingsIn$userId, mean)
-  itemMeans <- tapply(ratingsIn$rating, ratingsIn$itemId, mean)
-  ratingsInEmb <- ratingsIn #replce again
+  userMeans <- tapply( newXS$rating, newXS$userId, mean)
+  itemMeans <- tapply( newXS$rating, newXS$itemId, mean)
+  ratingsInEmb <- newXS
 
   ratingsInEmb$userId <- userMeans[ratingsIn$userId]
   ratingsInEmb$itemId <- itemMeans[ratingsIn$itemId]
@@ -63,3 +63,5 @@ ratingProbsFit(trainIE, 5, 'CART', TRUE, 4)
   ratingsInEmb$itemId <- as.vector(ratingsInEmb$itemId)
 #use in built predict function and take test set from above + the tree that CART spits out as args. Divide this pred input with test set (well not the set but maybe take the abs value or sthg) and assign that as a probability variable
 #then return the latest pred
+   
+   }
