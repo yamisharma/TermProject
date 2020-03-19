@@ -1,4 +1,4 @@
-cartFunc <- function(ratingsIn, testSet) {
+cartFunc <- function(ratingsIn) {
 
   #View(ratingsIn)
   ratingsIn$userId <- as.factor(ratingsIn$userId)
