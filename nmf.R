@@ -77,4 +77,5 @@ predictNmf <- function(probsFitOut, newXS) {
   newXS$rating <- NA
   tst <- newXS
   mat <- fitModels(train, tst, rnk)
+  return(mat)
 }
