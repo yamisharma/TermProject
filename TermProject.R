@@ -23,7 +23,33 @@ tstSong <- song[testSetIndices, ]
 
 ## LOAD DATA## 
 
+#KNN HELPER FUNCTION
+predict_knn <- function(dataIn, maxRating, targetUser, targetItem, k){
+  names(dataIn) <- c("UserID","ItemID","rating")
+  # Only consider relevant users
+  new_users <- as.numeric(as.vector(dataIn[dataIn$ItemID == targetItem,1]))
+  new_users <- new_users[new_users != targetUser]
+  if (k > length(new_users)) {
+    tryCatch("k must be <= num of relevant users")
+  }
+  # Compare dist b/w users
+  user_dists <- matrix(0,0,2)
+  for (user_itr in new_users) {
+    user_dists <- rbind(user_dists, c(user_itr,dist(x=rbind(as.vector(dataIn$ItemID[dataIn$UserID == targetUser]),as.vector(dataIn$ItemID[dataIn$UserID == user_itr])))))
+  }
+  # Create neighborhood (choose k closest)
+  user_dists <- as.data.frame(user_dists)
+  user_dists <- user_dists[order(user_dists$V2),]
+  user_dists <- user_dists[1:k,]
+  # Make list of all ratings from neighbors
+  neigh_rats <- matrix(0,0,1)
+  for (user_itr in user_dists$V1) {
+    neigh_rats <- rbind(neigh_rats, dataIn$rating[dataIn$UserID == user_itr & dataIn$ItemID == targetItem])
+  }
+  return (list("knn", neigh_rats))
+}
 
+## RATINGSPROBFIT
 ratingProbsFit <- function(dataIn,maxRating,predMethod,embedMeans,specialArgs) {
   require(lme4)
   require(partykit)
@@ -76,31 +102,7 @@ ratingProbsFit <- function(dataIn,maxRating,predMethod,embedMeans,specialArgs) {
   }
 }
 
-predict_knn <- function(dataIn, maxRating, targetUser, targetItem, k){
-  names(dataIn) <- c("UserID","ItemID","rating")
-  # Only consider relevant users
-  new_users <- as.numeric(as.vector(dataIn[dataIn$ItemID == targetItem,1]))
-  new_users <- new_users[new_users != targetUser]
-  if (k > length(new_users)) {
-    tryCatch("k must be <= num of relevant users")
-  }
-  # Compare dist b/w users
-  user_dists <- matrix(0,0,2)
-  for (user_itr in new_users) {
-    user_dists <- rbind(user_dists, c(user_itr,dist(x=rbind(as.vector(dataIn$ItemID[dataIn$UserID == targetUser]),as.vector(dataIn$ItemID[dataIn$UserID == user_itr])))))
-  }
-  # Create neighborhood (choose k closest)
-  user_dists <- as.data.frame(user_dists)
-  user_dists <- user_dists[order(user_dists$V2),]
-  user_dists <- user_dists[1:k,]
-  # Make list of all ratings from neighbors
-  neigh_rats <- matrix(0,0,1)
-  for (user_itr in user_dists$V1) {
-    neigh_rats <- rbind(neigh_rats, dataIn$rating[dataIn$UserID == user_itr & dataIn$ItemID == targetItem])
-  }
-  return (list("knn", neigh_rats))
-}
-
+## NMF HELPER FUNCTIONS
 createMatrix <- function(rating, data) {
   f = function (x, output) {
     if (x[3] == rating) {
@@ -153,6 +155,7 @@ predictNmf <- function(probsFitOut, newXS) {
   return(mat)
 }
 
+##PREDICT.RECPROBS
 predict.recProbs <- function(probsFitOut,newXs) {
   if (probsFitOut[[1]] == "knn") {
     neigh_rats <- recProbsFit[[2]]
