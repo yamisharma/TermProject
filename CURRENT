@@ -13,14 +13,8 @@ ratingProbsFit <- function(dataIn,maxRating,predMethod,embedMeans,specialArgs){
       rating_known <- as.integer(dataIn$rating == i)
       rating_known <- as.factor(rating_known)
       
-      data_known <- data.frame(dataIn[1:2],rating_known)
-      data_f<-sample(1:nrow(data_known),0.05*nrow(data_known))
-      
-      testSet<-data_known[data_f,]
-      trainSet<-data_known[-data_f,]
-      
       glmout <- glm(rating_known ~ userID + itemID, data = trainSet, family = binomial)
-      output[[glm_output]] <- glmout
+      output[[glm_output]] <- glmout #stores into an array
       
     }
     probsFitOut <- list(dataIn = dataIn, predMethod = "logit", maxRating = maxRating,specialArgs = output)
