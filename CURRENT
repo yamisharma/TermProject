@@ -6,15 +6,22 @@ ratingProbsFit <- function(dataIn,maxRating,predMethod,embedMeans,specialArgs){
   
   names(dataIn) <- c("userId", "itemId", "rating")
   
+  #Lines 9 to 28: logit 
+  
   # predMethod & embedMeans:
   if(predMethod == "logit"){
-    #loop for maxrating which is 5 in our case?
+    #loop for maxrating which is 5 in our case
     for(i in 1: maxRating){
       rating_known <- as.integer(dataIn$rating == i)
       rating_known <- as.factor(rating_known)
+      data_known <- data.frame(dataIn[1:2],rating_known)
+      
+      test<-sample(1:nrow(data_known),nrow(data_known))
+      testSet <- data_known[test,]
+      trainSet <- data_known[-test,]
       
       glmout <- glm(rating_known ~ userID + itemID, data = trainSet, family = binomial)
-      output[[glm_output]] <- glmout #stores into an array
+      output[[glm_output]] <- glmout #into an array
       
     }
     probsFitOut <- list(dataIn = dataIn, predMethod = "logit", maxRating = maxRating,specialArgs = output)
@@ -89,11 +96,12 @@ predict.recProbs <- function(probsFitOut,newXs) {
     }
     return(probs_out)
   }
-  if(probsFitOut/predmethod == "logit"){
+  if(probsFitOut$predmethod == "logit"){
     for(i in 1: probsFitOut$maxRating){
       pred_output <- predict.glm(probsFitOut$,newXs,type = "response")
       final_pred <- cbind(final_pred,pred_output)
     }
+    return (final_pred)
   }
 }
 
