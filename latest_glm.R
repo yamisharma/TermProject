@@ -37,7 +37,6 @@ if(probsFitOut/predmethod == "logit"){
     pred_output <- predict.glm(probsFitOut$,newXs,type = "response")
     final_pred <- cbind(final_pred,pred_output)
   }
-  data(final_pred)<-(1:probsFitOut$maxRating)
 
 #run test
   
