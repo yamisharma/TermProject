@@ -16,7 +16,7 @@ cartFunc <- function(ratingsIn) {
 
   ctout <- ctree(rating ~ ., data = ratingsInEmb (#maybe have the training set here @aditi) not sure. Do we do CV on the emb dataset to create a new train set??)
   
-  probsFitOut <- list(dataIn = dataIn, predMethod = "CART", maxRating = maxRating,specialArgs = output)
+  probsFitOut <- list(dataIn = dataIn, predMethod = "CART", maxRating = maxRating)
     #s3 class
   class(probsFitOut)<-"recProbs" 
 }
