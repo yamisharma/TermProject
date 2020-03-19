@@ -62,6 +62,7 @@ fitModels <- function(ratingsIn, testSet, rnk) {
   
   list <- lapply(1:5, f)
   mat <- cbind(list[[1]],list[[2]],list[[3]],list[[4]],list[[5]])
+  name(mat) <- c("probRating1", "probRating2", "probRating3", "probRating4", "probRating5")
 }
 
 probsFitNmf <- function(dataIn, maxRating, predMethod, specialArgs) {
