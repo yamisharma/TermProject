@@ -64,4 +64,12 @@ ratingProbsFit(trainIE, 5, 'CART', TRUE, 4)
 #use in built predict function and take test set from above + the tree that CART spits out as args. Divide this pred input with test set (well not the set but maybe take the abs value or sthg) and assign that as a probability variable
 #then return the latest pred
    
+   if(probsFitOut/predmethod == "CART"){
+  for(i in 1: probsFitOut$maxRating){
+    pred_output <- predict.CART(probsFitOut$,newXs,type = "response")
+    final_pred <- cbind(final_pred,pred_output)
+  }
+
+   
+   
    }
