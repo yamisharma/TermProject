@@ -47,6 +47,7 @@ ratingProbsFit <- function(dataIn,maxRating,predMethod,embedMeans,specialArgs) {
     }
     probsFitOut <- list(dataIn = dataIn, predMethod = "logit", maxRating = maxRating,specialArgs = output)
     class(probsFitOut)<-"recProbs"
+    return(probsFitOut)
   }
   
   # for nmf, the specialArgs must contain the rank
