@@ -15,7 +15,10 @@ cartFunc <- function(ratingsIn) {
   ratingsInEmb$itemId <- as.vector(ratingsInEmb$itemId)
 
   ctout <- ctree(rating ~ ., data = ratingsInEmb (#maybe have the training set here @aditi) not sure. Do we do CV on the emb dataset to create a new train set??)
-  print(node_party(ctout))
+  
+  probsFitOut <- list(dataIn = dataIn, predMethod = "CART", maxRating = maxRating,specialArgs = output)
+    #s3 class
+  class(probsFitOut)<-"recProbs" 
 }
 
 predict <- function(probsFitOut,newXs) {
@@ -66,7 +69,7 @@ ratingProbsFit(trainIE, 5, 'CART', TRUE, 4)
    
    if(probsFitOut/predmethod == "CART"){
   for(i in 1: probsFitOut$maxRating){
-    pred_output <- predict.CART(probsFitOut$,newXs,type = "response")
+    pred_output <- predict.CART(probsFitOut$,ratingsInEmb,type = "response")
     final_pred <- cbind(final_pred,pred_output)
   }
 
